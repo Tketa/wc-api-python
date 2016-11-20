@@ -57,7 +57,7 @@ class API(object):
 
         return oauth.get_oauth_url()
 
-    def __request(self, method, endpoint, data):
+    def __request(self, method, endpoint, data, extra_params=None):
         """ Do requests """
         url = self.__get_url(endpoint)
         auth = None
@@ -78,8 +78,11 @@ class API(object):
         else:
             url = self.__get_oauth_url(url, method)
 
-        if data is not None:
+        if data:
             data = jsonencode(data, ensure_ascii=False).encode('utf-8')
+        if extra_params:
+            for key, value in extra_params.items():
+                params[key] = value
 
         return request(
             method=method,
@@ -92,9 +95,9 @@ class API(object):
             headers=headers
         )
 
-    def get(self, endpoint):
+    def get(self, endpoint, **kwargs):
         """ Get requests """
-        return self.__request("GET", endpoint, None)
+        return self.__request("GET", endpoint, None, kwargs)
 
     def post(self, endpoint, data):
         """ POST requests """
